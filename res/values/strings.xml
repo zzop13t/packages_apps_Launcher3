@@ -712,6 +712,8 @@
     <!-- Icon pack support -->
     <string name="icon_pack_title">图标包</string>
     <string name="icon_pack_summary">使用第三方图标包替换系统图标</string>
+    <string name="icon_pack_list_title">图标包</string>
+    <string name="icon_pack_selected">已选中</string>
     <string name="icon_pack_default_label">系统默认</string>
     <string name="icon_pack_no_market">未安装任何图标包</string>
     <string name="icon_pack_use_mask">为未适配的应用套用图标包蒙版</string>
