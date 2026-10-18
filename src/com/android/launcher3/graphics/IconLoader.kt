@@ -33,6 +33,7 @@ import com.android.launcher3.dragndrop.FolderAdaptiveIcon
 import com.android.launcher3.icons.BitmapInfo
 import com.android.launcher3.icons.CacheableShortcutInfo.Companion.getIcon
 import com.android.launcher3.icons.IconCache
+import com.android.launcher3.icons.SelfShapedIcon
 import com.android.launcher3.icons.ThirdPartyIconProvider
 import com.android.launcher3.icons.LauncherIcons
 import com.android.launcher3.icons.cache.CacheLookupFlag
@@ -132,8 +133,11 @@ constructor(
                 LauncherIcons.obtain(context).use { li -> li.wrapToAdaptiveIcon(mainIcon) }
             }
 
-        // Inject theme icon drawable
-        if (Utilities.ATLEAST_T && useTheme) {
+        // Inject theme icon drawable.
+        // Icons that bring their own artwork (icon packs) are skipped: re-wrapping them into a
+        // themed adaptive icon drops their own shape, and the transition then clips them to the
+        // launcher icon shape.
+        if (Utilities.ATLEAST_T && useTheme && result !is SelfShapedIcon) {
             val themeController = themeManager.themeController
             if (themeController != null) {
                 result =

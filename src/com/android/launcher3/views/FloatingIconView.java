@@ -55,6 +55,7 @@ import com.android.launcher3.folder.FolderIcon;
 import com.android.launcher3.graphics.IconLoader;
 import com.android.launcher3.graphics.PreloadIconDelegate;
 import com.android.launcher3.icons.FastBitmapDrawable;
+import com.android.launcher3.icons.SelfShapedIcon;
 import com.android.launcher3.icons.IconNormalizer;
 import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.model.data.ItemInfoWithIcon;
@@ -371,7 +372,10 @@ public class FloatingIconView extends FrameLayout implements
                 (InsettableFrameLayout.LayoutParams) getLayoutParams();
         mBadge = badge;
         mClipIconView.setIcon(drawable, iconOffset, lp, mIsOpening, usingCustomShape, dp);
-        if (drawable instanceof AdaptiveIconDrawable) {
+        // Icons that bring their own artwork (icon packs) are drawn edge to edge; stretching the
+        // container to the adaptive icon aspect ratio would make them look elongated during the
+        // transition.
+        if (drawable instanceof AdaptiveIconDrawable && !(drawable instanceof SelfShapedIcon)) {
             final int originalHeight = lp.height;
             final int originalWidth = lp.width;
 
@@ -461,7 +465,7 @@ public class FloatingIconView extends FrameLayout implements
     @WorkerThread
     @SuppressWarnings("WrongThread")
     private static int getOffsetForIconBounds(Launcher l, Drawable drawable, RectF position) {
-        if (!(drawable instanceof AdaptiveIconDrawable)) {
+        if (!(drawable instanceof AdaptiveIconDrawable) || drawable instanceof SelfShapedIcon) {
             return 0;
         }
         int blurSizeOutline =

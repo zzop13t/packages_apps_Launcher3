@@ -15,6 +15,7 @@
  */
 package com.android.launcher3.icons;
 
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Path;
@@ -51,8 +52,15 @@ public class IconPackDrawable extends AdaptiveIconDrawable implements SelfShaped
 
     @Override
     public void draw(@NonNull Canvas canvas) {
+        // Match what BaseIconFactory does when it rasterises a non adaptive icon: the artwork is
+        // inset to ICON_VISIBLE_AREA_FACTOR of the icon size. Drawing it edge to edge here would
+        // make the icon look bigger during the launch/close transition than when it settles.
         Rect bounds = getBounds();
-        mSource.setBounds(bounds.left, bounds.top, bounds.right, bounds.bottom);
+        float insetFraction = (1f - IconNormalizer.ICON_VISIBLE_AREA_FACTOR) / 2f;
+        int insetX = Math.round(bounds.width() * insetFraction);
+        int insetY = Math.round(bounds.height() * insetFraction);
+        mSource.setBounds(bounds.left + insetX, bounds.top + insetY,
+                bounds.right - insetX, bounds.bottom - insetY);
         mSource.draw(canvas);
     }
 
@@ -60,5 +68,36 @@ public class IconPackDrawable extends AdaptiveIconDrawable implements SelfShaped
     @Override
     public Path getIconMask() {
         return NO_MASK;
+    }
+
+    /**
+     * Cloning through {@link AdaptiveIconDrawable}'s constant state would produce a plain
+     * AdaptiveIconDrawable: the pack artwork would then be drawn inside the adaptive mask (i.e. the
+     * launcher icon shape) and the transition would show a different shape than the settled icon.
+     * Keep the class by providing our own constant state.
+     */
+    @Override
+    public ConstantState getConstantState() {
+        return new ConstantState() {
+            @Override
+            public Drawable newDrawable() {
+                return new IconPackDrawable(cloneSource());
+            }
+
+            @Override
+            public Drawable newDrawable(Resources res) {
+                return new IconPackDrawable(cloneSource());
+            }
+
+            @Override
+            public int getChangingConfigurations() {
+                return 0;
+            }
+        };
+    }
+
+    private Drawable cloneSource() {
+        ConstantState state = mSource.getConstantState();
+        return state != null ? state.newDrawable() : mSource;
     }
 }

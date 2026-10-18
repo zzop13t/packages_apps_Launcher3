@@ -236,7 +236,11 @@ public class ClipIconView extends View implements ClipPathView {
      */
     public void setIcon(@Nullable Drawable drawable, int iconOffset, MarginLayoutParams lp,
             boolean isOpening, boolean usingCustomShape, DeviceProfile dp) {
-        mIsAdaptiveIcon = drawable instanceof AdaptiveIconDrawable;
+        // Icon pack icons bring their own shape: treating them as adaptive would run the icon
+        // shape reveal below, which clips them to the global launcher shape first (the icon is
+        // briefly drawn as a circle). Draw them as a whole instead.
+        mIsAdaptiveIcon = drawable instanceof AdaptiveIconDrawable
+                && !(drawable instanceof com.android.launcher3.icons.SelfShapedIcon);
         if (mIsAdaptiveIcon) {
             mIsFolderIcon = drawable instanceof FolderAdaptiveIcon;
             final ThemeManager themeManager = ThemeManager.INSTANCE.get(getContext());
