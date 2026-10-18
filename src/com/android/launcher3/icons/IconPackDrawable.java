@@ -32,9 +32,10 @@ import androidx.annotation.NonNull;
  * {@link AdaptiveIconDrawable}: else it wraps them with a solid background plate. Reporting as an
  * adaptive icon avoids that plate, but the adaptive draw path would also clip the artwork to the
  * icon shape of the launcher. Icon packs ship their own shaped artwork, so the drawing is done here
- * directly instead.
+ * directly instead. Implementing {@link SelfShapedIcon} also tells the icon loader not to clip it
+ * with the launcher icon shape.
  */
-public class IconPackDrawable extends AdaptiveIconDrawable {
+public class IconPackDrawable extends AdaptiveIconDrawable implements SelfShapedIcon {
 
     private static final Path NO_MASK = new Path();
 
