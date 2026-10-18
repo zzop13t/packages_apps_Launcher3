@@ -24,6 +24,11 @@
         android:persistent="false"
         android:widgetLayout="@layout/notification_pref_warning" />
 
+    <com.android.launcher3.settings.IconPackPreference
+        android:key="pref_icon_pack"
+        android:title="@string/icon_pack_title"
+        android:summary="@string/icon_pack_summary" />
+
     <!--
       LAUNCHER_ADD_NEW_APPS_TO_HOME_SCREEN_ENABLED(613)
       LAUNCHER_ADD_NEW_APPS_TO_HOME_SCREEN_DISABLED(614)

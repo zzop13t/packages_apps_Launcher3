@@ -708,4 +708,11 @@
     <string name="folder_creator_add" translatable="false">Add</string>
     <string name="folder_creator_cancel" translatable="false">Cancel</string>
 
+
+    <!-- Icon pack support -->
+    <string name="icon_pack_title">图标包</string>
+    <string name="icon_pack_summary">使用第三方图标包替换系统图标</string>
+    <string name="icon_pack_default_label">系统默认</string>
+    <string name="icon_pack_no_market">未安装任何图标包</string>
+    <string name="icon_pack_applying">正在应用图标包，桌面即将重新启动</string>
 </resources>
