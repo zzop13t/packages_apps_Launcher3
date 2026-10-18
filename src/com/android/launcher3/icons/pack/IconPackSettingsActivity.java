@@ -29,7 +29,7 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceCategory;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceScreen;
-import androidx.preference.SwitchPreferenceCompat;
+import androidx.preference.SwitchPreference;
 
 import com.android.launcher3.LauncherFiles;
 import com.android.launcher3.R;
@@ -48,7 +48,7 @@ public class IconPackSettingsActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.settings_activity);
+        setContentView(R.layout.icon_pack_settings);
 
         setActionBar((Toolbar) findViewById(R.id.action_bar));
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
@@ -109,7 +109,7 @@ public class IconPackSettingsActivity extends FragmentActivity {
                 }
             }
 
-            SwitchPreferenceCompat mask = new SwitchPreferenceCompat(context);
+            SwitchPreference mask = new SwitchPreference(context);
             mask.setKey("mask_uncovered");
             mask.setTitle(R.string.icon_pack_use_mask);
             mask.setSummary(R.string.icon_pack_use_mask_summary);

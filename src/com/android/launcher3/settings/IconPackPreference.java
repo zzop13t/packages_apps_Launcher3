@@ -36,6 +36,9 @@ public class IconPackPreference extends Preference {
     public IconPackPreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         setPersistent(false);
+        // Pin the row layout: the default resolved from the theme differs from the other
+        // preferences on the same screen, which misaligns the titles.
+        setLayoutResource(androidx.preference.R.layout.preference_material);
     }
 
     @Override
