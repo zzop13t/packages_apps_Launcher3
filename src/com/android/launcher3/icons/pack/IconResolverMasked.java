@@ -66,11 +66,14 @@ public class IconResolverMasked implements IconResolver {
         try {
             Resources res = pm.getResourcesForApplication(mPackInfo);
 
-            // Re-render without scaling after creating the bitmap in the right dimensions.
-            Bitmap iconBm = li.createScaledBitmap(icon, BaseIconFactory.MODE_WITH_SHADOW);
-            mCanvas.setBitmap(iconBm);
-            icon.setBounds(0, 0, iconBm.getWidth(), iconBm.getHeight());
-            icon.draw(mCanvas);
+            // Rasterise the icon at the launcher icon size. Do not wrap it into an adaptive
+            // plate and do not add a shadow: both would draw a visible ring around the icon,
+            // which then shows through everything the pack masks.
+            BaseIconFactory.IconOptions options = new BaseIconFactory.IconOptions()
+                    .setWrapNonAdaptiveIcon(false)
+                    .setAddShadows(false)
+                    .setBitmapGenerationMode(BaseIconFactory.MODE_DEFAULT);
+            Bitmap iconBm = li.createBadgedIconBitmap(icon, options).icon;
 
             scaleBitmap(iconBm, mData.scale);
 

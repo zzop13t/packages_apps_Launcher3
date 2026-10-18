@@ -52,6 +52,11 @@ public class ThirdPartyIconProvider extends LauncherIconProvider {
 
         IconResolver.DefaultDrawableProvider fallback = () -> super.getIcon(info, iconDpi);
         Drawable icon = ThirdPartyIconUtils.getByKey(mContext, key, iconDpi, fallback);
-        return icon == null ? fallback.get() : icon;
+        if (icon == null) {
+            return fallback.get();
+        }
+        // Pack icons are bitmaps; hand them over as adaptive icons so the launcher does not put a
+        // background plate behind them.
+        return ThirdPartyIconUtils.wrapAsAdaptive(icon);
     }
 }

@@ -714,5 +714,7 @@
     <string name="icon_pack_summary">使用第三方图标包替换系统图标</string>
     <string name="icon_pack_default_label">系统默认</string>
     <string name="icon_pack_no_market">未安装任何图标包</string>
+    <string name="icon_pack_use_mask">为未适配的应用套用图标包蒙版</string>
+    <string name="icon_pack_use_mask_summary">开启后，图标包没有收录的应用也会垫上图标包的底图与蒙版（部分图标包会出现白边）</string>
     <string name="icon_pack_applying">正在应用图标包，桌面即将重新启动</string>
 </resources>

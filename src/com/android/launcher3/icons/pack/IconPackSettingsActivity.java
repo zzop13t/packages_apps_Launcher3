@@ -26,6 +26,8 @@ import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -65,6 +67,33 @@ public class IconPackSettingsActivity extends Activity {
         int pad = dp(24);
         header.setPadding(pad, dp(20), pad, dp(12));
         root.addView(header, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        // Mask switch: only meaningful when a pack that ships mask/back/upon layers is selected,
+        // but it stays visible so that the current behaviour is discoverable.
+        CheckBox mask = new CheckBox(this);
+        mask.setText(R.string.icon_pack_use_mask);
+        mask.setChecked(mManager.isMaskingEnabled());
+        mask.setPadding(pad, dp(4), pad, 0);
+        mask.setEnabled(mPackages.size() > 1);
+        mask.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked == mManager.isMaskingEnabled()) {
+                    return;
+                }
+                mManager.setMaskingEnabled(isChecked);
+                applyAndRestart();
+            }
+        });
+        root.addView(mask, new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        TextView maskSummary = new TextView(this);
+        maskSummary.setText(R.string.icon_pack_use_mask_summary);
+        maskSummary.setAlpha(0.7f);
+        maskSummary.setPadding(pad, 0, pad, dp(12));
+        root.addView(maskSummary, new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         if (mPackages.size() == 1) {
@@ -133,13 +162,16 @@ public class IconPackSettingsActivity extends Activity {
             return;
         }
         mManager.setSelectedPack(packageName);
+        applyAndRestart();
+    }
 
-        // Drop the cached icons so they are rebuilt with the pack that is now selected.
+    /** Drops the cached icons and restarts the launcher so that every icon is rebuilt. */
+    private void applyAndRestart() {
         deleteDatabase(LauncherFiles.APP_ICONS_DB);
         Toast.makeText(this, R.string.icon_pack_applying, Toast.LENGTH_SHORT).show();
 
-        // Restart the launcher process, which is the only way to make every already cached icon
-        // pick up the new pack.
+        // Restarting the process is the only way to make every already cached icon pick up the
+        // new pack or the new masking setting.
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {

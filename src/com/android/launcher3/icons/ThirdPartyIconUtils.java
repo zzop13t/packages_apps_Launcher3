@@ -16,6 +16,9 @@
 package com.android.launcher3.icons;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.AdaptiveIconDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 
 import com.android.launcher3.icons.pack.IconPackManager;
@@ -31,6 +34,18 @@ class ThirdPartyIconUtils {
         if (resolver == null) {
             return null;
         }
-        return resolver.getIcon(iconDpi, fallback);
+        return wrapAsAdaptive(resolver.getIcon(iconDpi, fallback));
+    }
+
+    /**
+     * Icon packs ship plain bitmaps. The launcher wraps any non adaptive icon into an adaptive one
+     * with a solid background, which draws a plate (white by default) behind the pack icon. Wrapping
+     * it here with a transparent background keeps the pack artwork as is.
+     */
+    static Drawable wrapAsAdaptive(Drawable icon) {
+        if (icon == null || icon instanceof AdaptiveIconDrawable) {
+            return icon;
+        }
+        return new AdaptiveIconDrawable(new ColorDrawable(Color.TRANSPARENT), icon);
     }
 }

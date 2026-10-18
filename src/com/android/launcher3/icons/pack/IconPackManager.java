@@ -51,6 +51,7 @@ public class IconPackManager extends BroadcastReceiver {
 
     private static final String PREFS_NAME = "icon_pack_prefs";
     private static final String KEY_SELECTED = "selected_pack";
+    private static final String KEY_MASK = "mask_uncovered";
 
     /** Intents that icon pack apps use to advertise themselves. */
     private static final String[] ICON_INTENT_ACTIONS = new String[]{
@@ -164,6 +165,20 @@ public class IconPackManager extends BroadcastReceiver {
         prefs().edit().putString(KEY_SELECTED, packageName == null ? "" : packageName).apply();
     }
 
+    /**
+     * Whether apps the pack has no drawable for should still get the pack's mask/back/upon layers
+     * applied to their original icon.
+     */
+    public boolean isMaskingEnabled() {
+        // Off by default: packs usually draw their back layer for their own icons, so putting it
+        // behind a system icon looks like a coloured ring around it.
+        return prefs().getBoolean(KEY_MASK, false);
+    }
+
+    public void setMaskingEnabled(boolean enabled) {
+        prefs().edit().putBoolean(KEY_MASK, enabled).apply();
+    }
+
     private SharedPreferences prefs() {
         return mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
@@ -191,7 +206,7 @@ public class IconPackManager extends BroadcastReceiver {
                             drawableId, data.calendarPrefix.get(key.componentName));
                 }
             }
-            if (data.hasMasking()) {
+            if (data.hasMasking() && isMaskingEnabled()) {
                 return new IconResolverMasked(mContext, data, pack.getAi(), key.hashCode());
             }
         } catch (PackageManager.NameNotFoundException | XmlPullParserException | IOException e) {
