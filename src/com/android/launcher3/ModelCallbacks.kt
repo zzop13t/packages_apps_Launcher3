@@ -20,6 +20,7 @@ import com.android.launcher3.allapps.AllAppsStore
 import com.android.launcher3.config.FeatureFlags
 import com.android.launcher3.dagger.LauncherComponentProvider.appComponent
 import com.android.launcher3.model.BgDataModel
+import com.android.launcher3.model.WorkspaceAutoPopulateTask
 import com.android.launcher3.model.BgDataModel.FixedContainerItems
 import com.android.launcher3.model.ItemInstallQueue
 import com.android.launcher3.model.ItemInstallQueue.FLAG_LOADER_RUNNING
@@ -243,6 +244,10 @@ class ModelCallbacks(private var launcher: Launcher) : BgDataModel.Callbacks {
         Preconditions.assertUIThread()
         val hadWorkApps = launcher.appsView.shouldShowTabs()
         launcher.activityComponent.appsStore.setApps(apps, flags, packageUserKeytoUidMap)
+        if (FeatureFlags.AUTO_POPULATE_WORKSPACE) {
+            // All installed apps are known now; make sure each one has a workspace shortcut.
+            launcher.model.enqueueModelUpdateTask(WorkspaceAutoPopulateTask())
+        }
         PopupContainer.dismissInvalidPopup(launcher)
         if (
             hadWorkApps != launcher.appsView.shouldShowTabs() &&

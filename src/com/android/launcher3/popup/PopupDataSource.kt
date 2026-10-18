@@ -58,6 +58,11 @@ import com.android.launcher3.widget.LauncherAppWidgetHostView
 import com.android.wm.shell.shared.bubbles.logging.EntryPoint
 import javax.inject.Inject
 
+/**
+ * Entries for the "Remove" system shortcut: always empty, the action is not offered.
+ */
+private fun removeShortcutEntries(): List<PopupData> = emptyList()
+
 object PopupDataSource {
 
     // Popup data for remove shortcut.
@@ -77,13 +82,13 @@ object PopupDataSource {
 object FolderSystemShortcuts : PopupDataMapper {
 
     override fun getPopupDataByItemInfo(itemInfo: ItemInfo): List<PopupData>? =
-        if (itemInfo.itemType == ITEM_TYPE_FOLDER) listOf(PopupDataSource.removePopupData) else null
+        if (itemInfo.itemType == ITEM_TYPE_FOLDER) removeShortcutEntries() else null
 }
 
 object AppPairSystemShortcuts : PopupDataMapper {
 
     override fun getPopupDataByItemInfo(itemInfo: ItemInfo): List<PopupData>? =
-        if (itemInfo.itemType == ITEM_TYPE_APP_GROUP) listOf(PopupDataSource.removePopupData)
+        if (itemInfo.itemType == ITEM_TYPE_APP_GROUP) removeShortcutEntries()
         else null
 }
 
@@ -120,9 +125,9 @@ object AppWidgetSystemShortcuts : PopupDataMapper {
     override fun getPopupDataByItemInfo(itemInfo: ItemInfo): List<PopupData>? {
         return if (itemInfo.itemType != ITEM_TYPE_APPWIDGET) null
         else if (itemInfo is LauncherAppWidgetInfo && itemInfo.isReconfigurable) {
-            listOf(PopupDataSource.removePopupData, widgetSettingsPopupData)
+            removeShortcutEntries() + listOf(widgetSettingsPopupData)
         } else {
-            listOf(PopupDataSource.removePopupData)
+            removeShortcutEntries()
         }
     }
 }
@@ -203,7 +208,7 @@ constructor(private val renameDialogFactory: HomeScreenFilesRenameDialogFactory)
 object CustomWidgetSystemShortcuts : PopupDataMapper {
 
     override fun getPopupDataByItemInfo(itemInfo: ItemInfo): List<PopupData>? =
-        if (itemInfo.itemType == ITEM_TYPE_CUSTOM_APPWIDGET) listOf(PopupDataSource.removePopupData)
+        if (itemInfo.itemType == ITEM_TYPE_CUSTOM_APPWIDGET) removeShortcutEntries()
         else null
 }
 

@@ -58,7 +58,8 @@ class PopupControllerForAppIcon<T> : PopupController<T> where T : Context, T : A
                     .map<SystemShortcut<T>> { s ->
                         s.getShortcut(activityContext, item, icon) as SystemShortcut<T>?
                     }
-                    .filter { it != null }
+                    // The "Remove" shortcut is not offered: hide it for every app icon.
+                    .filter { it != null && it !is SystemShortcut.RemoveApp<*> }
                     .collect(Collectors.toList())
 
             container =

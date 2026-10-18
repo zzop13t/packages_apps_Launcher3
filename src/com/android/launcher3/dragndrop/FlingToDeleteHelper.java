@@ -82,7 +82,9 @@ public class FlingToDeleteHelper {
     private PointF isFlingingToDelete() {
         if (mVelocityTracker == null) return null;
         if (mDropTarget == null) {
-            mDropTarget = (ButtonDropTarget) mLauncher.findViewById(R.id.delete_target_text);
+            // The delete drop target is not part of the layout (see drop_target_bar.xml), so
+            // fling-to-delete has nothing to aim at and stays disabled.
+            return null;
         }
         if (mDropTarget == null || !mDropTarget.isDropEnabled()) return null;
         ViewConfiguration config = ViewConfiguration.get(mLauncher);

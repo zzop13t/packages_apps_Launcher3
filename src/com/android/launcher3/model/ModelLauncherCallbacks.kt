@@ -22,6 +22,7 @@ import android.content.pm.ShortcutInfo
 import android.os.UserHandle
 import android.text.TextUtils
 import com.android.launcher3.LauncherModel.ModelUpdateTask
+import com.android.launcher3.config.FeatureFlags
 import com.android.launcher3.logging.FileLog
 import com.android.launcher3.model.tasks.CacheDataUpdatedTask
 import com.android.launcher3.model.tasks.PackageIncrementalDownloadUpdatedTask
@@ -47,6 +48,10 @@ class ModelLauncherCallbacks(private var taskExecutor: Consumer<ModelUpdateTask>
     override fun onPackageAdded(packageName: String, user: UserHandle) {
         FileLog.d(TAG, "onPackageAdded triggered for packageName=$packageName, user=$user")
         taskExecutor.accept(PackageUpdatedTask(OP_ADD, user, packageName))
+        if (FeatureFlags.AUTO_POPULATE_WORKSPACE) {
+            // A newly installed app gets its workspace shortcut right away.
+            taskExecutor.accept(WorkspaceAutoPopulateTask(packageName))
+        }
     }
 
     override fun onPackageChanged(packageName: String, user: UserHandle) {

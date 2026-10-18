@@ -22,16 +22,6 @@
     android:theme="@style/HomeScreenElementTheme"
     android:visibility="invisible">
 
-    <!-- Delete target -->
-    <com.android.launcher3.DeleteDropTarget
-        android:id="@+id/delete_target_text"
-        style="@style/DropTargetButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="@string/remove_drop_target_label" />
-
     <!-- Uninstall target -->
     <com.android.launcher3.SecondaryDropTarget
         android:id="@+id/uninstall_target_text"

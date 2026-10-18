@@ -41,6 +41,12 @@ public final class FeatureFlags {
     public static final boolean IS_STUDIO_BUILD = BuildConfig.IS_STUDIO_BUILD;
 
     /**
+     * Whether every installed app is placed on the workspace automatically, so the home screen
+     * lists all apps. The app drawer itself stays fully functional.
+     */
+    public static final boolean AUTO_POPULATE_WORKSPACE = true;
+
+    /**
      * Feature flag to handle define config changes dynamically instead of killing the process.
      * <p>
      *
