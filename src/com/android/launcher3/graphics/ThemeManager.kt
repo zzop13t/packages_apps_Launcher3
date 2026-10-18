@@ -148,6 +148,11 @@ constructor(
         val shapeModel =
             prefs.get(PREF_ICON_SHAPE).let { shapeOverride ->
                 ShapesProvider.iconShapes.firstOrNull { it.key == shapeOverride }
+                    // Default to the rounded square: icon packs draw their own rounded shapes and
+                    // clipping them to a circle loses that.
+                    ?: ShapesProvider.iconShapes.firstOrNull {
+                        it.key == ShapesProvider.SQUARE_KEY
+                    }
             }
         val iconMask =
             when {
@@ -233,7 +238,7 @@ constructor(
     companion object {
 
         @JvmField val INSTANCE = DaggerSingletonObject(LauncherAppComponent::getThemeManager)
-        @JvmField val PREF_ICON_SHAPE = backedUpItem("icon_shape_model", "")
+        @JvmField val PREF_ICON_SHAPE = backedUpItem("icon_shape_model", "square")
 
         @JvmField val DEFAULT_SHAPE_DELEGATE = pickBestShape(shapeStr = "")
 
