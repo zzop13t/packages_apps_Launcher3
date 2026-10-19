@@ -3540,6 +3540,11 @@ public abstract class RecentsView<
         }
     }
 
+    /** 供概览动作栏的「全部清除」按钮调用（与列表末尾的 ClearAllButton 同一套逻辑）。 */
+    public void clearAllTasks() {
+        dismissAllTasks(null /* view */);
+    }
+
     @SuppressWarnings("unused")
     private void dismissAllTasks(View view) {
         InteractionJankMonitorWrapper.begin(this, Cuj.CUJ_LAUNCHER_OVERVIEW_CLEAR_ALL);

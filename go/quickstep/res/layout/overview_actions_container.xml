@@ -84,6 +84,25 @@
         </LinearLayout>
 
         <Space
+            android:id="@+id/spacer_clear_all"
+            android:layout_width="@dimen/go_overview_button_container_margin"
+            android:layout_height="1dp" />
+
+        <LinearLayout
+            android:id="@+id/layout_clear_all"
+            style="@style/GoOverviewActionButtonContainer">
+            <ImageButton
+                android:id="@+id/action_clear_all"
+                style="@style/GoOverviewActionButton"
+                android:src="@drawable/ic_remove_no_shadow"
+                android:contentDescription="@string/recents_clear_all"
+                android:background="@drawable/round_rect_button" />
+            <TextView
+                style="@style/GoOverviewActionButtonCaption"
+                android:text="@string/recents_clear_all" />
+        </LinearLayout>
+
+        <Space
             android:layout_width="0dp"
             android:layout_height="1dp"
             android:layout_weight="1" />

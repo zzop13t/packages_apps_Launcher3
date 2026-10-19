@@ -23,6 +23,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewParent;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -31,6 +32,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 
+import com.android.launcher3.Launcher;
 import com.android.launcher3.DeviceProfile;
 import com.android.launcher3.Insettable;
 import com.android.launcher3.R;
@@ -210,6 +212,8 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
         // casting this.
         View screenshotButton = findViewById(R.id.action_screenshot);
         screenshotButton.setOnClickListener(this);
+        // 概览动作栏里的「全部清除」：不用经过 task overlay 的回调，直接作用于 RecentsView
+        findViewById(R.id.action_clear_all).setOnClickListener(this);
         mSplitButton = findViewById(R.id.action_split);
         mSplitButton.setOnClickListener(this);
         mSaveAppPairButton.setOnClickListener(this);
@@ -226,16 +230,46 @@ public class OverviewActionsView<T extends OverlayUICallbacks> extends FrameLayo
 
     @Override
     public void onClick(View view) {
+        int id = view.getId();
+        if (id == R.id.action_clear_all) {
+            RecentsView recentsView = findRecentsView();
+            if (recentsView != null) {
+                recentsView.clearAllTasks();
+            }
+            return;
+        }
         if (mCallbacks == null) {
             return;
         }
-        int id = view.getId();
         if (id == R.id.action_screenshot) {
             mCallbacks.onScreenshot();
         } else if (id == R.id.action_split) {
             mCallbacks.onSplit();
         } else if (id == R.id.action_save_app_pair) {
             mCallbacks.onSaveAppPair();
+        }
+    }
+
+    /**
+     * 找宿主 RecentsView。
+     *
+     * 注意：动作栏和 RecentsView 在 overview_panel.xml 里是**兄弟**节点，所以不能只往上找父节点；
+     * 找不到时再从 Launcher 拿。
+     */
+    @Nullable
+    private RecentsView findRecentsView() {
+        ViewParent parent = getParent();
+        while (parent != null) {
+            if (parent instanceof RecentsView) {
+                return (RecentsView) parent;
+            }
+            parent = parent.getParent();
+        }
+        try {
+            return Launcher.getLauncher(getContext()).getOverviewPanel();
+        } catch (Throwable t) {
+            Log.w(TAG, "Unable to resolve RecentsView", t);
+            return null;
         }
     }
 
