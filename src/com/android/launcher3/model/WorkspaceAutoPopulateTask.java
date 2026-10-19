@@ -75,7 +75,6 @@ public class WorkspaceAutoPopulateTask implements ModelUpdateTask {
 
         Set<String> onWorkspace = new HashSet<>();
         Set<Long> occupied = new HashSet<>();
-        int lastScreen = 0;
         synchronized (dataModel) {
             for (ItemInfo info : dataModel.itemsIdMap) {
                 ComponentName cn = info.getTargetComponent();
@@ -85,7 +84,6 @@ public class WorkspaceAutoPopulateTask implements ModelUpdateTask {
                 if (info.container != CONTAINER_DESKTOP) {
                     continue;
                 }
-                lastScreen = Math.max(lastScreen, info.screenId);
                 for (int x = info.cellX; x < info.cellX + Math.max(1, info.spanX); x++) {
                     for (int y = info.cellY; y < info.cellY + Math.max(1, info.spanY); y++) {
                         occupied.add(cellKey(info.screenId, x, y));
@@ -95,9 +93,6 @@ public class WorkspaceAutoPopulateTask implements ModelUpdateTask {
         }
 
         List<WorkspaceItemInfo> added = new ArrayList<>();
-        int screenId = lastScreen;
-        int cellX = 0;
-        int cellY = 0;
         for (AppInfo app : allAppsList.data) {
             ComponentName cn = app.componentName;
             if (cn == null) {
@@ -113,18 +108,13 @@ public class WorkspaceAutoPopulateTask implements ModelUpdateTask {
             onWorkspace.add(key);
             placed.add(key);
 
-            // Advance to the next free cell.
-            while (cellY < numRows && occupied.contains(cellKey(screenId, cellX, cellY))) {
-                if (++cellX >= numColumns) {
-                    cellX = 0;
-                    cellY++;
-                }
-            }
-            if (cellY >= numRows) {
-                screenId++;
-                cellX = 0;
-                cellY = 0;
-            }
+            // 从第一屏开始按「从上到下、从左到右」找第一个空位：
+            // 之前是从最后一屏开始扫的，于是前几屏里微件旁边空出来的格永远不会被用到，
+            // 新装的应用只能跑到最后一屏/新的一屏去。
+            int[] freeCell = findFirstFreeCell(occupied, numColumns, numRows);
+            int screenId = freeCell[0];
+            int cellX = freeCell[1];
+            int cellY = freeCell[2];
             occupied.add(cellKey(screenId, cellX, cellY));
 
             WorkspaceItemInfo item = app.makeWorkspaceItem(context);
@@ -136,15 +126,27 @@ public class WorkspaceAutoPopulateTask implements ModelUpdateTask {
                     cellX, cellY);
             added.add(item);
 
-            if (++cellX >= numColumns) {
-                cellX = 0;
-                cellY++;
-            }
         }
 
         prefs.edit().putStringSet(KEY_PLACED, placed).apply();
         if (!added.isEmpty()) {
             taskController.bindUpdatedWorkspaceItems(added);
+        }
+    }
+
+    /**
+     * 返回第一个空位：屏幕从小到大，屏幕内从上到下、从左到右。
+     * 所有已有屏幕都满时，返回下一屏的 (0, 0)。
+     */
+    private static int[] findFirstFreeCell(Set<Long> occupied, int numColumns, int numRows) {
+        for (int screenId = 0; ; screenId++) {
+            for (int cellY = 0; cellY < numRows; cellY++) {
+                for (int cellX = 0; cellX < numColumns; cellX++) {
+                    if (!occupied.contains(cellKey(screenId, cellX, cellY))) {
+                        return new int[]{screenId, cellX, cellY};
+                    }
+                }
+            }
         }
     }
 
