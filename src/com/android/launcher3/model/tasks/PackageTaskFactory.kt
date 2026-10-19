@@ -18,6 +18,7 @@ package com.android.launcher3.model.tasks
 
 import android.os.UserHandle
 import android.util.Log
+import com.android.launcher3.model.WorkspaceAutoPopulateTask
 import com.android.launcher3.LauncherModel.ModelUpdateTask
 import com.android.launcher3.model.BgDataModel
 import com.android.launcher3.model.ItemInstallQueue
@@ -42,6 +43,8 @@ object PackageTaskFactory {
                 taskController.iconCache.removeIconsForPkg(it, user)
                 apps.removePackage(it, user)
             }
+            // 忘掉这些包的「已放置」记录，否则重装后不会再补图标
+            WorkspaceAutoPopulateTask.forgetPackages(taskController.context, packages)
             taskController.bindApplicationsIfNeeded()
 
             val matcher = ItemInfoMatcher.ofPackages(packages, user)

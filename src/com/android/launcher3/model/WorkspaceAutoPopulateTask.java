@@ -32,6 +32,7 @@ import com.android.launcher3.model.data.ItemInfo;
 import com.android.launcher3.model.data.WorkspaceItemInfo;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,6 +61,28 @@ public class WorkspaceAutoPopulateTask implements ModelUpdateTask {
     /** Populates a single package only, used when an app is installed while the launcher runs. */
     public WorkspaceAutoPopulateTask(@NonNull String packageName) {
         mOnlyPackage = packageName;
+    }
+
+    /**
+     * 卸载应用时清掉它的「已放置」记录。
+     *
+     * 否则 prefs 里的 key 会一直留着，重装同一个包时任务会认为它已经在桌面上，于是不再补图标。
+     * key 是 {@link ComponentName#flattenToString()}，形如 "pkg/cls"。
+     */
+    public static void forgetPackages(@NonNull Context context,
+            @NonNull Collection<String> packageNames) {
+        if (packageNames.isEmpty()) {
+            return;
+        }
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Set<String> placed = new HashSet<>(prefs.getStringSet(KEY_PLACED, Set.of()));
+        boolean changed = placed.removeIf(key -> {
+            int slash = key.indexOf('/');
+            return packageNames.contains(slash > 0 ? key.substring(0, slash) : key);
+        });
+        if (changed) {
+            prefs.edit().putStringSet(KEY_PLACED, placed).apply();
+        }
     }
 
     @Override
