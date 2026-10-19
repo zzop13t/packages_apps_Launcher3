@@ -89,9 +89,16 @@ public class DeleteDropTarget extends ButtonDropTarget {
     @Override
     protected void setupItemInfo(ItemInfo info) {}
 
+    /**
+     * 只有微件拖动时才显示"移除"。
+     *
+     * 应用拖动已经由 SecondaryDropTarget 提供"卸载"，两个按钮同时出现会让人分不清；
+     * 而微件在 SecondaryDropTarget 里只会得到 RECONFIGURE / INVALID，没有移除入口，
+     * 所以这里专门为微件补上。
+     */
     @Override
     protected boolean supportsDrop(ItemInfo info) {
-        return true;
+        return info.itemType == LauncherSettings.Favorites.ITEM_TYPE_APPWIDGET;
     }
 
     /**
